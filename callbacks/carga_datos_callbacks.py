@@ -28,10 +28,28 @@ def register_callbacks(app, stored_data):
                 else:
                     return html.Div(['Formato de archivo no soportado.'])
 
-                stored_data['raw_df'] = df
+                # Asegurarse de que los nombres de las columnas sean strings
+                df.columns = [str(col) for col in df.columns]
+
+                # Store the DataFrame as a dictionary (serializable)
+                stored_data['raw_df_data'] = df.to_dict('records')
+                stored_data['raw_df_columns'] = df.columns.tolist()
+
                 summary = data_loader.get_data_summary(df)
                 preview_table = visualization.create_preview_table(summary['preview'])
 
+                # 1. Debug: Print the structure of preview_table
+                print("Debugging preview_table:")
+                print(preview_table)
+
+                # 2. Debug: Print the first few rows of the dataframe
+                print("Debugging df.head():")
+                print(df.head().to_markdown(index=False, numalign="left", stralign="left"))
+
+                # 3. Debug: Print the columns and their types
+                print("Debugging df.info():")
+                print(df.info())
+                
                 return html.Div([
                     html.H3(f'Archivo cargado: {filename}'),
                     html.Div(f"Número de registros: {summary['num_registros']}"),
@@ -40,7 +58,7 @@ def register_callbacks(app, stored_data):
                     html.H5("Previsualización de datos:"),
                     dash_table.DataTable(
                         id='table-preview',
-                        columns=[{"name": i, "id": i} for i in df.columns],
+                        columns=[{"name": str(i), "id": str(i)} for i in df.columns],
                         data=preview_table,
                         page_size=10
                     ),

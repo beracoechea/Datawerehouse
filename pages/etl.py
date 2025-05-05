@@ -1,5 +1,6 @@
 from dash import html, dcc, dash_table
 import dash_bootstrap_components as dbc
+import pandas as pd
 
 def render_etl():
     if 'raw_df' in globals() and isinstance(globals()['raw_df'], pd.DataFrame):
